@@ -2,6 +2,7 @@
 using namespace std;
 
 void metodo1(int bits[], int total, int n);
+void metodo2(int bits[], int total, int n);
 
 void metodo1(int bits[], int total, int n) {
     int i = 0;
@@ -33,6 +34,19 @@ void metodo1(int bits[], int total, int n) {
     }
 }
 
+void metodo2(int bits[], int total, int n) {
+    int i = 0;
+    while (i < total) {
+        if (i + n <= total) {
+            int ultimo = bits[i + n - 1];
+            for (int j = n - 1; j > 0; j--) {
+                bits[i + j] = bits[i + j - 1];
+            }
+            bits[i] = ultimo;
+        }
+        i += n;
+    }
+}
 
 int main() {
 
