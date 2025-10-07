@@ -3,6 +3,61 @@ using namespace std;
 
 void metodo1(int bits[], int total, int n);
 void metodo2(int bits[], int total, int n);
+void charABinario(unsigned char c, int bin[8]);
+
+
+int main() {
+    char texto[100];
+    int n, metodo;
+
+    cout << "Ingrese el texto a codificar: ";
+    cin.getline(texto, 100);
+
+    if (texto[0] == '\0') {
+        cout << "Error: no ingreso texto valido." << endl;
+        return 1;
+    }
+
+    cout << "Ingrese el valor de n (tamano del bloque): ";
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Error: n debe ser mayor que 0." << endl;
+        return 1;
+    }
+
+    cout << "Seleccione metodo (1 o 2): ";
+    cin >> metodo;
+
+    if (metodo != 1 && metodo != 2) {
+        cout << "Error: metodo invalido." << endl;
+        return 1;
+    }
+
+    int bits[800];
+    int total = 0;
+    for (int k = 0; texto[k] != '\0'; k++) {
+        int bin[8];
+        charABinario(texto[k], bin);
+        for (int j = 0; j < 8; j++) {
+            bits[total++] = bin[j];
+        }
+    }
+
+    if (n > total) {
+        cout << "Error: n no puede ser mayor al total de bits (" << total << ")." << endl;
+        return 1;
+    }
+
+    if (metodo == 1) metodo1(bits, total, n);
+    else metodo2(bits, total, n);
+
+    cout << "Texto codificado en binario: ";
+    for (int i = 0; i < total; i++) cout << bits[i];
+    cout << endl;
+
+    return 0;
+}
 
 void metodo1(int bits[], int total, int n) {
     int i = 0;
@@ -48,6 +103,11 @@ void metodo2(int bits[], int total, int n) {
     }
 }
 
-int main() {
-
+void charABinario(unsigned char c, int bin[8]) {
+    for (int i = 7; i >= 0; i--) {
+        bin[i] = c % 2;
+        c = c / 2;
+    }
 }
+
+
