@@ -4,4 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        cajero.cpp \
         main.cpp
+
+HEADERS += \
+    cajero.h
