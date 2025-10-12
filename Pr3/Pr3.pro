@@ -5,6 +5,7 @@ CONFIG -= qt
 
 SOURCES += \
         cajero.cpp \
+        codificador.cpp \
         main.cpp
 
 HEADERS += \
