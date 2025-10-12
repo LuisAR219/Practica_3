@@ -6,7 +6,7 @@ unsigned int construirBloques(int bitsEnBloque,int bitInicial, const unsigned ch
 void escribirBits(int valorBit, unsigned char* decodificado, int &byteIndex, int &bitIndex);
 int calcularBitsEnBloque(int bitInicial, int n, int numBits);
 
-unsigned char* decodificador(unsigned char* mjsCodificado, int tamanoCodificado, int n, int metodo){
+unsigned char* decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo){
 
     unsigned char* decodificado = new unsigned char[tamanoCodificado]();
 
@@ -97,8 +97,32 @@ unsigned char* decodificador(unsigned char* mjsCodificado, int tamanoCodificado,
 
     else if (metodo==2){
 
+        int numBits=tamanoCodificado*8, numBloques=(numBits+n-1)/n;
+
+        int byteIndex=0, bitIndex=0, valorBit=0;
+        unsigned int bloque=0, mascara=1;
+
+        for (int bloqueNum=0; bloqueNum<numBloques; bloqueNum++) {
+
+            int bitInicial=bloqueNum*n;
+            int bitsEnBloque=calcularBitsEnBloque(bitInicial,n,numBits);
+
+            bloque=construirBloques(bitsEnBloque,bitInicial,msjCodificado);
+
+            unsigned int mascaraBits = (1u << bitsEnBloque) - 1;
+            unsigned int bloqueModificado=((bloque << 1) & mascaraBits) | ((bloque >> (bitsEnBloque - 1)) & mascara);
+
+            for (int i = bitsEnBloque - 1; i >= 0; i--) {
+                valorBit = (bloqueModificado >> i) & 1;
+                escribirBits(valorBit, decodificado, byteIndex, bitIndex);
+            }
+        }
+
+        return decodificado;
+
     }
     else{
+        delete[] decodificado;
         return nullptr;
     }
 }
@@ -151,3 +175,41 @@ int calcularBitsEnBloque(int bitInicial, int n, int numBits){
     return bitsEnBloque;
 
 }
+
+#include <bitset>
+
+// 🔽 Copia aquí todas tus funciones: decodificador, construirBloques, escribirBits, calcularBitsEnBloque
+
+// Función para imprimir bits legiblemente
+void imprimirBits(const unsigned char* data, int size) {
+    for (int i = 0; i < size; i++) {
+        for (int b = 7; b >= 0; b--)
+            std::cout << ((data[i] >> b) & 1);
+        std::cout << ' ';
+    }
+    std::cout << '\n';
+}
+
+int main() {
+    unsigned char mensaje[] = {0b11001100, 0b10101010}; // 16 bits, 2 bytes
+    int tamano = 2;
+    int n = 5;
+
+    std::cout << "Mensaje codificado (original): ";
+    imprimirBits(mensaje, tamano);
+
+    // 🔹 Método 1
+    unsigned char* dec1 = decodificador(mensaje, tamano, n, 1);
+    std::cout << "Decodificado (metodo 1):       ";
+    imprimirBits(dec1, tamano);
+    delete[] dec1;
+
+    // 🔹 Método 2
+    unsigned char* dec2 = decodificador(mensaje, tamano, n, 2);
+    std::cout << "Decodificado (metodo 2):       ";
+    imprimirBits(dec2, tamano);
+    delete[] dec2;
+
+    return 0;
+}
+
