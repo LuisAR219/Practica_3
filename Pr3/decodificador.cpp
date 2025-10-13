@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -6,9 +7,9 @@ unsigned int construirBloques(int bitsEnBloque,int bitInicial, const unsigned ch
 void escribirBits(int valorBit, unsigned char* decodificado, int &byteIndex, int &bitIndex);
 int calcularBitsEnBloque(int bitInicial, int n, int numBits);
 
-unsigned char* decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo){
+string decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo){
 
-    unsigned char* decodificado = new unsigned char[tamanoCodificado]();
+    unsigned char* decodificado= new unsigned char[tamanoCodificado]();
 
     if (metodo==1){
 
@@ -92,7 +93,10 @@ unsigned char* decodificador(unsigned char* msjCodificado, int tamanoCodificado,
                 bloqueAnterior=bloqueAux;
             }
         }
-        return decodificado;
+
+        string resultado(reinterpret_cast<char*>(decodificado), tamanoCodificado);
+        delete[] decodificado;
+        return resultado;
     }
 
     else if (metodo==2){
@@ -118,13 +122,11 @@ unsigned char* decodificador(unsigned char* msjCodificado, int tamanoCodificado,
             }
         }
 
-        return decodificado;
-
-    }
-    else{
+        string resultado(reinterpret_cast<char*>(decodificado), tamanoCodificado);
         delete[] decodificado;
-        return nullptr;
+        return resultado;
     }
+
 }
 
 

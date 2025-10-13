@@ -4,10 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
+        admin.cpp \
         cajero.cpp \
         codificador.cpp \
         main.cpp\
-        decodificador.cpp
+        decodificador.cpp\
+        usuario.cpp
 
 HEADERS += \
-    cajero.h
+    cajero.h\
+    usuario.h
