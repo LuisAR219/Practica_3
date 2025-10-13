@@ -8,29 +8,30 @@ void charABinario(unsigned char c, int bin[8]) {
     }
 }
 
-void metodo1(int bits[], int total, int n) {
+void metodo1(const int bitsOriginal[], int bitsResultado[], int total, int n) {
     int i = 0;
     while (i < total) {
         int unos = 0, ceros = 0;
 
         for (int j = 0; j < n && i + j < total; j++) {
-            if (bits[i + j] == 1) unos++;
+            bitsResultado[i + j] = bitsOriginal[i + j];
+            if (bitsOriginal[i + j] == 1) unos++;
             else ceros++;
         }
 
         if (unos == ceros) {
             for (int j = 0; j < n && i + j < total; j++) {
-                bits[i + j] = (bits[i + j] == 0 ? 1 : 0);
+                bitsResultado[i + j] = (bitsOriginal[i + j] == 0 ? 1 : 0);
             }
         }
         else if (ceros > unos) {
             for (int j = 1; j < n && i + j < total; j += 2) {
-                bits[i + j] = (bits[i + j] == 0 ? 1 : 0);
+                bitsResultado[i + j] = (bitsOriginal[i + j] == 0 ? 1 : 0);
             }
         }
         else {
             for (int j = 2; j < n && i + j < total; j += 3) {
-                bits[i + j] = (bits[i + j] == 0 ? 1 : 0);
+                bitsResultado[i + j] = (bitsOriginal[i + j] == 0 ? 1 : 0);
             }
         }
 
@@ -38,22 +39,28 @@ void metodo1(int bits[], int total, int n) {
     }
 }
 
-void metodo2(int bits[], int total, int n) {
+void metodo2(const int bitsOriginal[], int bitsResultado[], int total, int n) {
     int i = 0;
     while (i < total) {
-        if (i + n <= total) {
-            int ultimo = bits[i + n - 1];
-            for (int j = n - 1; j > 0; j--) {
-                bits[i + j] = bits[i + j - 1];
-            }
-            bits[i] = ultimo;
+        for (int j = 0; j < n && i + j < total; j++) {
+            bitsResultado[i + j] = bitsOriginal[i + j];
         }
+
+        if (i + n <= total) {
+            int ultimo = bitsOriginal[i + n - 1];
+            for (int j = n - 1; j > 0; j--) {
+                bitsResultado[i + j] = bitsOriginal[i + j - 1];
+            }
+            bitsResultado[i] = ultimo;
+        }
+
         i += n;
     }
 }
 
-bool codificarTexto(const char texto[], int n, int metodo, int bits[], int &total) {
+bool codificarTexto(const char texto[], int n, int metodo, int bitsCodificado[], int &total) {
     total = 0;
+    int bitsOriginal[800];
 
     if (texto[0] == '\0') {
         cout << "Error: no ingreso texto valido." << endl;
@@ -74,7 +81,7 @@ bool codificarTexto(const char texto[], int n, int metodo, int bits[], int &tota
         int bin[8];
         charABinario(texto[k], bin);
         for (int j = 0; j < 8; j++) {
-            bits[total++] = bin[j];
+            bitsOriginal[total++] = bin[j];
         }
     }
 
@@ -83,8 +90,8 @@ bool codificarTexto(const char texto[], int n, int metodo, int bits[], int &tota
         return false;
     }
 
-    if (metodo == 1) metodo1(bits, total, n);
-    else metodo2(bits, total, n);
+    if (metodo == 1) metodo1(bitsOriginal, bitsCodificado, total, n);
+    else metodo2(bitsOriginal, bitsCodificado, total, n);
 
     return true;
 }
