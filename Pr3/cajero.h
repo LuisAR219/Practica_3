@@ -9,23 +9,20 @@ using namespace std;
 
 class Cajero {
 private:
-    usuario sistema;
     usuario* usuarioActual;
     int semilla;
     int metodo;
     string archivoUsuarios;
 
 public:
-
     Cajero();
-    void configurarSistema();
+    ~Cajero();
+
     void iniciarSesion();
-    void menuAdministrador();
-    void registrarNuevoUsuario();
     void menuCliente();
     void consultarSaldo();
     void retirarDinero();
     void ejecutar();
 };
 
-#endif
+#endif // CAJERO_H
