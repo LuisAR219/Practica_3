@@ -9,8 +9,8 @@ using namespace std;
 
 class Cajero {
 private:
-    Usuario sistema;
-    Usuario* usuarioActual;
+    usuario sistema;
+    usuario* usuarioActual;
     int semilla;
     int metodo;
     string archivoUsuarios;
@@ -19,6 +19,8 @@ public:
 
     Cajero();
     void configurarSistema();
+    void iniciarSesion();
+    void menuAdministrador();
 };
 
 #endif
