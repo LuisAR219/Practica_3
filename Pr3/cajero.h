@@ -23,6 +23,9 @@ public:
     void menuAdministrador();
     void registrarNuevoUsuario();
     void menuCliente();
+    void consultarSaldo();
+    void retirarDinero();
+    void ejecutar();
 };
 
 #endif

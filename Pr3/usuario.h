@@ -12,6 +12,7 @@ private:
     int saldo;
 
 public:
+    usuario() : cedula(""), clave(""), saldo(0) {}
     usuario(string cedula_, string clave_, int saldo_):cedula(cedula_),clave(clave_),saldo(saldo_){}
     int consultarSaldo();
     bool retirarSaldo(int cantidadRetirar);

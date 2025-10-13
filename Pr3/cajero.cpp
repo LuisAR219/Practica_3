@@ -104,9 +104,7 @@ void Cajero::registrarNuevoUsuario() {
     cout << "Usuario registrado exitosamente.\n";
 }
 
-// ------------------------------------------------------------
-// Menú cliente
-// ------------------------------------------------------------
+
 void Cajero::menuCliente() {
     int opcion;
     do {
@@ -132,4 +130,59 @@ void Cajero::menuCliente() {
             cout << "Opción inválida.\n";
         }
     } while (opcion != 3);
+}
+
+
+void Cajero::consultarSaldo() {
+    cout << "\nConsultando saldo..." << endl;
+
+    if (usuarioActual->getSaldo() < 1000) {
+        cout << "No tienes suficiente saldo para realizar esta operación.\n";
+        return;
+    }
+
+    usuarioActual->actualizarSaldo(usuarioActual->getSaldo() - 1000);
+    cout << "Saldo actual: " << usuarioActual->getSaldo() << " COP\n";
+}
+
+
+void Cajero::retirarDinero() {
+    double monto;
+    cout << "\nIngrese el monto a retirar: ";
+    cin >> monto;
+
+    double total = monto + 1000; // incluye el costo del servicio
+    if (usuarioActual->getSaldo() < total) {
+        cout << "Saldo insuficiente.\n";
+        return;
+    }
+
+    usuarioActual->actualizarSaldo(usuarioActual->getSaldo() - total);
+    cout << "Retiro exitoso. Nuevo saldo: "
+         << usuarioActual->getSaldo() << " COP\n";
+}
+
+
+void Cajero::ejecutar() {
+    configurarSistema();
+
+    int opcion;
+    do {
+        cout << "\n=== SISTEMA DE CAJERO ===" << endl;
+        cout << "1. Iniciar sesión\n";
+        cout << "2. Salir\n";
+        cout << "Opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            iniciarSesion();
+            break;
+        case 2:
+            cout << "Hasta pronto.\n";
+            break;
+        default:
+            cout << "Opción inválida.\n";
+        }
+    } while (opcion != 2);
 }
