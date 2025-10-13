@@ -81,3 +81,55 @@ void Cajero::menuAdministrador() {
         }
     } while (opcion != 3);
 }
+
+void Cajero::registrarNuevoUsuario() {
+    string cedula, clave;
+    double saldo;
+
+    cout << "\n=== REGISTRAR USUARIO ===" << endl;
+    cout << "Cédula: ";
+    cin >> cedula;
+
+    if (sistema.existeUsuario(cedula)) {
+        cout << "Ya existe un usuario con esa cédula.\n";
+        return;
+    }
+
+    cout << "Clave: ";
+    cin >> clave;
+    cout << "Saldo inicial: ";
+    cin >> saldo;
+
+    sistema.registrarUsuario(cedula, clave, saldo, false);
+    cout << "Usuario registrado exitosamente.\n";
+}
+
+// ------------------------------------------------------------
+// Menú cliente
+// ------------------------------------------------------------
+void Cajero::menuCliente() {
+    int opcion;
+    do {
+        cout << "\n=== MENÚ CLIENTE ===" << endl;
+        cout << "1. Consultar saldo\n";
+        cout << "2. Retirar dinero\n";
+        cout << "3. Salir\n";
+        cout << "Opción: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            consultarSaldo();
+            break;
+        case 2:
+            retirarDinero();
+            break;
+        case 3:
+            sistema.guardarUsuarios(semilla, metodo);
+            cout << "Sesión cerrada.\n";
+            break;
+        default:
+            cout << "Opción inválida.\n";
+        }
+    } while (opcion != 3);
+}

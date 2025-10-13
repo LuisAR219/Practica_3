@@ -21,6 +21,8 @@ public:
     void configurarSistema();
     void iniciarSesion();
     void menuAdministrador();
+    void registrarNuevoUsuario();
+    void menuCliente();
 };
 
 #endif
