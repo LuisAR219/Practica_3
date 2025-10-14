@@ -1,5 +1,6 @@
-#include <iostream>
+#include <string>
 using namespace std;
+
 
 bool leerBit(const unsigned char bits[], int pos) {
     int byteIndex = pos / 8;
@@ -16,9 +17,9 @@ void escribirBit(unsigned char bits[], int pos, bool valor) {
         bits[byteIndex] &= ~(1 << bitIndex);
 }
 
-int textoABits(const char texto[], unsigned char bits[]) {
+int textoABits(const string& texto, unsigned char bits[]) {
     int totalBits = 0;
-    for (int k = 0; texto[k] != '\0'; k++) {
+    for (size_t k = 0; k < texto.size(); k++) {
         unsigned char c = texto[k];
         for (int i = 7; i >= 0; i--) {
             bool bit = (c >> i) & 1;
@@ -28,7 +29,26 @@ int textoABits(const char texto[], unsigned char bits[]) {
     return totalBits;
 }
 
-void metodo1(const unsigned char bitsOriginal[], unsigned char bitsResultado[], int total, int n) {
+string bitsATexto(const unsigned char bits[], int totalBits) {
+    string texto;
+    for (int i = 0; i < totalBits; i += 8) {
+        unsigned char c = 0;
+        for (int j = 0; j < 8 && i + j < totalBits; j++) {
+            c <<= 1;
+            c |= leerBit(bits, i + j);
+        }
+        texto.push_back(c);
+    }
+    return texto;
+}
+
+
+string metodo1(const string& texto, int n) {
+    unsigned char bitsOriginal[100] = {0};
+    unsigned char bitsResultado[100] = {0};
+
+    int total = textoABits(texto, bitsOriginal);
+
     for (int i = 0; i < total; i++)
         escribirBit(bitsResultado, i, leerBit(bitsOriginal, i));
 
@@ -50,9 +70,16 @@ void metodo1(const unsigned char bitsOriginal[], unsigned char bitsResultado[], 
         }
         i += n;
     }
+
+    return bitsATexto(bitsResultado, total);
 }
 
-void metodo2(const unsigned char bitsOriginal[], unsigned char bitsResultado[], int total, int n) {
+string metodo2(const string& texto, int n) {
+    unsigned char bitsOriginal[100] = {0};
+    unsigned char bitsResultado[100] = {0};
+
+    int total = textoABits(texto, bitsOriginal);
+
     for (int i = 0; i < total; i++)
         escribirBit(bitsResultado, i, leerBit(bitsOriginal, i));
 
@@ -66,46 +93,6 @@ void metodo2(const unsigned char bitsOriginal[], unsigned char bitsResultado[], 
         }
         i += n;
     }
-}
 
-bool codificarTexto(const char texto[], int n, int metodo, unsigned char bitsCodificado[], int &totalBits) {
-    if (texto[0] == '\0') {
-        cout << "Error: texto vacío." << endl;
-        return false;
-    }
-
-    if (n <= 0) {
-        cout << "Error: n debe ser mayor que 0." << endl;
-        return false;
-    }
-
-    if (metodo != 1 && metodo != 2) {
-        cout << "Error: método inválido." << endl;
-        return false;
-    }
-
-    unsigned char bitsOriginal[100] = {0};
-    unsigned char bitsResultado[100] = {0};
-    totalBits = textoABits(texto, bitsOriginal);
-
-    if (n > totalBits) {
-        cout << "Error: n no puede ser mayor que el total de bits (" << totalBits << ")." << endl;
-        return false;
-    }
-
-    if (metodo == 1)
-        metodo1(bitsOriginal, bitsResultado, totalBits, n);
-    else
-        metodo2(bitsOriginal, bitsResultado, totalBits, n);
-
-    for (int i = 0; i < (totalBits + 7) / 8; i++)
-        bitsCodificado[i] = bitsResultado[i];
-
-    return true;
-}
-
-void imprimirBits(const unsigned char bits[], int totalBits) {
-    for (int i = 0; i < totalBits; i++)
-        cout << leerBit(bits, i);
-    cout << endl;
+    return bitsATexto(bitsResultado, total);
 }
