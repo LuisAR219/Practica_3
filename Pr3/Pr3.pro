@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        admin.cpp \
+        administrador.cpp \
         cajero.cpp \
         codificador.cpp \
         main.cpp\
@@ -12,5 +12,6 @@ SOURCES += \
         usuario.cpp
 
 HEADERS += \
+    administrador.h \
     cajero.h\
     usuario.h

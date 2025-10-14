@@ -1,7 +1,9 @@
+#include <iostream>
+#include <fstream>
 #include "usuario.h"
 
-void metodo1(const int bitsOriginal[], int bitsResultado[], int total, int n);
-void metodo2(const int bitsOriginal[], int bitsResultado[], int total, int n);
+string metodo1(const string& texto, int n);
+string metodo2(const string& texto, int n);
 
 bool usuario::retirarSaldo(int cantidadRetirar){
 
@@ -30,7 +32,7 @@ int usuario::consultarSaldo(){
 
 usuario::~usuario(){
 
-    ifstream fileIn("usuarios.txt");
+    ifstream fileIn(archivoUsuarios);
     ofstream fileTemp("temp.txt");
 
     string linea;
@@ -43,17 +45,20 @@ usuario::~usuario(){
 
         string cedulaEncriptada = "";
         string claveEncriptada = "";
-        if (metodo == 1) {
-            metodo1(cedula, cedulaEncriptada, cedula.size(), n);
-            metodo1(clave, claveEncriptada, clave.size(), n);
+        string saldoEncriptado = "";
+        if (this->metodo == 1) {
+            cedulaEncriptada =metodo1(this->cedula, this->n);
+            claveEncriptada =metodo1(this->clave, this->n);
+            saldoEncriptado =metodo1(to_string(this->saldo), this->n);
         }
-        else if (metodo == 2) {
-            metodo2(cedula, cedulaEncriptada, cedula.size(), n);
-            metodo2(clave, claveEncriptada, clave.size(), n);
+        else if (this->metodo == 2) {
+            cedulaEncriptada =metodo2(this->cedula, this->n);
+            claveEncriptada =metodo2(this->clave, this->n);
+            saldoEncriptado =metodo2(to_string(this->saldo), this->n);
         }
 
         if (ced == cedulaEncriptada && cla == claveEncriptada) {
-            fileTemp << cedulaEncriptada << " " << claveEncriptada << " " << saldo << "\n";
+            fileTemp << cedulaEncriptada << " " << claveEncriptada << " " << saldoEncriptado << "\n";
         }
         else {
             fileTemp << linea << "\n";
