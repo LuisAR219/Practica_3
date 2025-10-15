@@ -5,30 +5,91 @@
 string metodo1(const string& texto, int n);
 string metodo2(const string& texto, int n);
 
-void administrador::crearUsuario() {
+bool esSoloNumeros(const string& texto) {
+    for (size_t i = 0; i < texto.size(); i++) {
+        if (texto[i] < '0' || texto[i] > '9') {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool esAlfaNumerico(const string& texto) {
+    for (size_t i = 0; i < texto.size(); i++) {
+        char c = texto[i];
+        bool esLetraMay = (c >= 'A' && c <= 'Z');
+        bool esLetraMin = (c >= 'a' && c <= 'z');
+        bool esNumero   = (c >= '0' && c <= '9');
+
+        if (!(esLetraMay || esLetraMin || esNumero)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void administrador(int n, int metodo) {
     string cedula, clave, saldo;
-    cout << "Cedula: ";
-    cin >> cedula;
-    cout << "Clave: ";
-    cin >> clave;
-    cout << "Saldo inicial: ";
-    cin >> saldo;
+
+    do {
+        cout << "Cedula (10 digitos, solo numeros): ";
+        cin >> cedula;
+
+        if (cedula.length() != 10) {
+            cout << "La cedula debe tener exactamente 10 caracteres.\n";
+            continue;
+        }
+        if (!esSoloNumeros(cedula)) {
+            cout << "La cedula solo puede contener numeros.\n";
+            continue;
+        }
+        break;
+    } while (true);
+
+    do {
+        cout << "Clave (solo letras y numeros): ";
+        cin >> clave;
+
+        if (!esAlfaNumerico(clave)) {
+            cout << "La clave solo puede contener letras y numeros.\n";
+            continue;
+        }
+        break;
+    } while (true);
+
+    do {
+        cout << "Saldo inicial (solo numeros): ";
+        cin >> saldo;
+
+        if (!esSoloNumeros(saldo)) {
+            cout << "El saldo solo puede contener numeros.\n";
+            continue;
+        }
+        break;
+    } while (true);
 
     ofstream file("usuarios.txt", ios::app);
-
-    string resultadoCedula = "";
-    string resultadoClave = "";
-    string resultadoSaldo = "";
-
-    if (this->metodo == 1) {
-        resultadoCedula = metodo1(cedula, this->n);
-        resultadoClave  = metodo1(clave, this->n);
-        resultadoSaldo  = metodo1(saldo, this->n);
+    if (!file) {
+        cerr << "Error al abrir el archivo de usuarios.\n";
+        return;
     }
-    else if (this->metodo == 2) {
-        resultadoCedula = metodo2(cedula, this->n);
-        resultadoClave  = metodo2(clave, this->n);
-        resultadoSaldo  = metodo2(saldo, this->n);
+
+    string resultadoCedula, resultadoClave, resultadoSaldo;
+
+    if (metodo == 1) {
+        resultadoCedula = metodo1(cedula, n);
+        resultadoClave  = metodo1(clave, n);
+        resultadoSaldo  = metodo1(saldo, n);
+    }
+    else if (metodo == 2) {
+        resultadoCedula = metodo2(cedula, n);
+        resultadoClave  = metodo2(clave, n);
+        resultadoSaldo  = metodo2(saldo, n);
+    }
+    else {
+        cout << "Metodo no valido.\n";
+        file.close();
+        return;
     }
 
     file << resultadoCedula << " " << resultadoClave << " " << resultadoSaldo << endl;
@@ -72,3 +133,5 @@ bool administrador::registroAdmin(){
     return true;
 
 }
+
+
