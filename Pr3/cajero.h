@@ -3,6 +3,7 @@
 
 #include <string>
 #include "usuario.h"
+#include "administrador.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ private:
     int semilla;
     int metodo;
     string archivoUsuarios;
+    administrador admin;
 
 public:
     Cajero();
@@ -23,6 +25,10 @@ public:
     void consultarSaldo();
     void retirarDinero();
     void ejecutar();
+    void setCodificacionUsuario();
+    void configurarSistema();
+    void procesoAdmin();
+
 };
 
 #endif // CAJERO_H

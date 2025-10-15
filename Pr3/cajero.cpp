@@ -1,8 +1,14 @@
 #include <iostream>
 #include <fstream>
 #include "Cajero.h"
+#include "usuario.h"
+
 using namespace std;
 
+usuario* registroUsuario(int n, int metodo, string cedula, string clave);
+string metodo1(const string& texto, int n);
+string metodo2(const string& texto, int n);
+string decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo);
 
 Cajero::Cajero() {
     usuarioActual = nullptr;
@@ -16,40 +22,45 @@ Cajero::~Cajero() {
     delete usuarioActual;
 }
 
+void Cajero::configurarSistema() {
+    cout << "=== CONFIGURACIÓN DEL SISTEMA ===" << endl;
+    cout << "Ingrese la semilla de codificación: ";
+    int semilla_;
+    cin >> semilla_;
+    cout << "Ingrese el método (1 o 2): ";
+    int metodo_;
+    cin >> metodo_;
+    cout << "Nombre del archivo de usuarios: ";
+    string archivoUsuarios_;
+    cin >> archivoUsuarios_;
+
+    this->semilla=semilla_;
+    this->metodo=metodo_;
+    this->archivoUsuarios=archivoUsuarios_;
+}
+
+void Cajero::setCodificacionUsuario(){
+    usuarioActual->n=this->semilla;
+    usuarioActual->metodo=this->metodo;
+    usuarioActual->archivoUsuarios=this->archivoUsuarios;
+}
 
 void Cajero::iniciarSesion() {
-    string cedulaIngresada, claveIngresada;
+    string cedula, clave;
     cout << "\n=== INICIO DE SESIÓN ===\n";
     cout << "Cédula: ";
-    cin >> cedulaIngresada;
+    cin >> cedula;
     cout << "Clave: ";
-    cin >> claveIngresada;
+    cin >> clave;
 
-    ifstream archivo(archivoUsuarios);
-    if (!archivo.is_open()) {
-        cout << "Error al abrir el archivo de usuarios.\n";
-        return;
-    }
+    this->usuarioActual=registroUsuario(this->semilla, this->metodo, cedula, clave);
 
-    bool encontrado = false;
-    string cedula, clave;
-    int saldo;
-
-    while (archivo >> cedula >> clave >> saldo) {
-        if (cedula == cedulaIngresada && clave == claveIngresada) {
-            usuarioActual = new usuario(cedula, clave, saldo);
-            encontrado = true;
-            break;
-        }
-    }
-    archivo.close();
-
-    if (!encontrado) {
+    if (this->usuarioActual==nullptr) {
         cout << "Usuario o clave incorrectos.\n";
         return;
     }
 
-    cout << "\nBienvenido al sistema, " << cedulaIngresada << ".\n";
+    cout << "\nBienvenido al sistema, " << cedula << ".\n";
     menuCliente();
 }
 
@@ -109,8 +120,9 @@ void Cajero::ejecutar() {
     int opcion = 0;
     do {
         cout << "\n=== CAJERO ELECTRÓNICO ===\n";
-        cout << "1. Iniciar sesión\n";
-        cout << "2. Salir\n";
+        cout << "1. Iniciar sesión como usuario\n";
+        cout << "2. Iniciar sesión como administrador\n";
+        cout << "3. Salir\n";
         cout << "Opción: ";
         cin >> opcion;
 
@@ -119,10 +131,59 @@ void Cajero::ejecutar() {
             iniciarSesion();
             break;
         case 2:
+            procesoAdmin();
+        case 3:
             cout << "Hasta pronto.\n";
             break;
         default:
             cout << "Opción inválida.\n";
         }
-    } while (opcion != 2);
+    } while (opcion != 3);
+}
+
+
+void Cajero::procesoAdmin(){
+
+    registro=admin->resgistroAdmin;
+    if (registro){
+        admin.setAdmin(this->n,this->metodo,this->archivoUsuarios);
+        admin.crearUsuario();
+    }
+
+}
+
+
+usuario* registroUsuario(int n, int metodo, string cedula, string clave) {
+    string cedulaEncriptada = "";
+    string claveEncriptada = "";
+
+    if (metodo == 1) {
+        cedulaEncriptada = metodo1(cedula, n);
+        claveEncriptada  = metodo1(clave, n);
+    }
+    else if (metodo == 2) {
+        cedulaEncriptada = metodo2(cedula, n);
+        claveEncriptada  = metodo2(clave, n);
+    }
+
+    ifstream file("usuarios.txt");
+    string linea;
+    while (getline(file, linea)) {
+        size_t pos1 = linea.find(' ');
+        size_t pos2 = linea.find(' ', pos1 + 1);
+
+        string ced = linea.substr(0, pos1);
+        string cla = linea.substr(pos1 + 1, pos2 - pos1 - 1);
+        string sal = linea.substr(pos2 + 1);
+
+        if (ced == cedulaEncriptada && cla == claveEncriptada) {
+            file.close();
+            string saldoDesencriptado=decodificador(sal,sal.size(),n,metodo);
+            int saldoFinal=stoi(saldoDesencriptado);
+            usuario* userActual = new usuario(cedula, clave, saldoFinal);
+            return userActual;
+        }
+    }
+    file.close();
+    return nullptr;
 }
