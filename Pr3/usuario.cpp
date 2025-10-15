@@ -1,4 +1,5 @@
 #include "usuario.h"
+#include "codificador.cpp"
 
 void metodo1(const int bitsOriginal[], int bitsResultado[], int total, int n);
 void metodo2(const int bitsOriginal[], int bitsResultado[], int total, int n);
