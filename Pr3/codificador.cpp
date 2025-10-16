@@ -49,24 +49,33 @@ string metodo1(const string& texto, int n) {
 
     int total = textoABits(texto, bitsOriginal);
 
-    for (int i = 0; i < total; i++)
-        escribirBit(bitsResultado, i, leerBit(bitsOriginal, i));
+    for (int j = 0; j < n && j < total; j++) {
+        escribirBit(bitsResultado, j, !leerBit(bitsOriginal, j));
+    }
 
-    int i = 0;
+    int i = n;
     while (i < total) {
         int unos = 0, ceros = 0;
-        for (int j = 0; j < n && i + j < total; j++)
-            leerBit(bitsOriginal, i + j) ? unos++ : ceros++;
+        for (int j = i - n; j < i && j < total; j++) {
+            leerBit(bitsOriginal, j) ? unos++ : ceros++;
+        }
 
         if (unos == ceros) {
-            for (int j = 0; j < n && i + j < total; j++)
+            for (int j = 0; j < n && i + j < total; j++) {
                 escribirBit(bitsResultado, i + j, !leerBit(bitsOriginal, i + j));
+            }
         } else if (ceros > unos) {
-            for (int j = 1; j < n && i + j < total; j += 2)
-                escribirBit(bitsResultado, i + j, !leerBit(bitsOriginal, i + j));
+            for (int j = 0; j < n && i + j < total; j++) {
+                bool bitOriginal = leerBit(bitsOriginal, i + j);
+                bool bitResultado = (j % 2 == 1) ? !bitOriginal : bitOriginal;
+                escribirBit(bitsResultado, i + j, bitResultado);
+            }
         } else {
-            for (int j = 2; j < n && i + j < total; j += 3)
-                escribirBit(bitsResultado, i + j, !leerBit(bitsOriginal, i + j));
+            for (int j = 0; j < n && i + j < total; j++) {
+                bool bitOriginal = leerBit(bitsOriginal, i + j);
+                bool bitResultado = ((j + 1) % 3 == 0) ? !bitOriginal : bitOriginal;
+                escribirBit(bitsResultado, i + j, bitResultado);
+            }
         }
         i += n;
     }
