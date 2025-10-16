@@ -86,9 +86,13 @@ void administrador::setAdmin(int n_, int metodo_, string archivoUsuario_){
 
 }
 
-bool administrador::registroAdmin(){
+bool administrador::registroAdmin(int n, int metodo){
 
     ifstream file(this->archivoAdmin);
+    if (!file.is_open()) {
+        cerr << "Error: no se pudo abrir el archivo de administrador.\n";
+        return false;
+    }
     string claveEncriptada;
     getline(file, claveEncriptada);
     file.close();
@@ -97,7 +101,7 @@ bool administrador::registroAdmin(){
     unsigned char* buffer = new unsigned char[tamano];
     for (int i = 0; i < tamano; i++) buffer[i] = claveEncriptada[i];
 
-    string claveReal = decodificador(buffer, tamano, this->n, this->metodo);
+    string claveReal = decodificador(buffer, tamano, n, metodo);
     delete[] buffer;
 
     string intento;

@@ -10,13 +10,13 @@ class administrador{
 private:
 
     int n, metodo;
-    string archivoAdmin="sudo.txt", archivoUsuario;
+    string archivoAdmin, archivoUsuario;
 
 public:
-    administrador():n(0),metodo(0),archivoUsuario(""){}
+    administrador():n(0),metodo(0),archivoUsuario(""),archivoAdmin("sudo.txt"){}
     void setAdmin(int n_, int metodo_, string archivoUsuario_);
     void crearUsuario();
-    bool registroAdmin();
+    bool registroAdmin(int n, int metodo);
 };
 
 #endif // ADMINISTRADOR_H

@@ -59,24 +59,12 @@ void Cajero::configurarSistema() {
         }
         else{
             metodo_=stoi(metodoStr);
-            if ((metodo_!=1)||(metodo_!=2)) {
+            if ((metodo_!=1)&&(metodo_!=2)) {
                 cout << "El metodo solo puede ser 1 o 2.\n";
                 continue;
             }
             break;
         }
-    } while (true);
-
-    string archivoUsuarios_;
-    do {
-        cout << "Nombre del archivo de usuarios: ";
-        cin >> archivoUsuarios_;
-
-        if (esAlfaNumerico(archivoUsuarios_)==false) {
-            cout << "El nombre del archivo no puede contener numeros.\n";
-            continue;
-        }
-        break;
     } while (true);
 
     string claveAdmin;
@@ -90,6 +78,9 @@ void Cajero::configurarSistema() {
         }
         break;
     } while (true);
+
+    this->semilla=semilla_;
+    this->metodo=metodo_;
 
     ofstream file("sudo.txt", ios::out);
     if (!file) {
@@ -107,10 +98,6 @@ void Cajero::configurarSistema() {
 
     file << resultadoClaveAdmin;
     file.close();
-
-    this->semilla=semilla_;
-    this->metodo=metodo_;
-    this->archivoUsuarios=archivoUsuarios_;
 }
 
 void Cajero::setCodificacionUsuario(){
@@ -219,7 +206,9 @@ void Cajero::ejecutar() {
 
 void Cajero::procesoAdmin(){
 
-    if (admin.registroAdmin()){
+    bool registro=admin.registroAdmin(this->semilla,this->metodo);
+
+    if (registro){
         admin.setAdmin(this->semilla,this->metodo,this->archivoUsuarios);
         admin.crearUsuario();
     }
