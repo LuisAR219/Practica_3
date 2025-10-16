@@ -30,7 +30,7 @@ void Cajero::configurarSistema() {
     string semillaStr;
     int semilla_;
     do {
-        cout << "Semilla de codificacion(1-32): ";
+        cout << "Semilla de codificacion(1-7): ";
         cin >> semillaStr;
 
         if (esSoloNumeros(semillaStr)==false) {
@@ -39,8 +39,8 @@ void Cajero::configurarSistema() {
         }
         else{
             semilla_=stoi(semillaStr);
-            if ((semilla_ < 1) || (semilla_ > 32)) {
-                cout << "La semilla solo puede ser de 1 a 32.\n";
+            if ((semilla_ < 1) || (semilla_ > 8)) {
+                cout << "La semilla solo puede ser de 1 a 7.\n";
                 continue;
             }
             break;
