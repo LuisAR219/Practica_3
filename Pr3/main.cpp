@@ -1,11 +1,11 @@
-#include <iostream>
-#include "administrador.h"
-#include "cajero.h"
+#include "Cajero.h"
 
 using namespace std;
 
 int main() {
-
+    Cajero cajero;
+    cajero.ejecutar();
+    return 0;
 }
 
 
