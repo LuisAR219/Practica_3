@@ -4,31 +4,11 @@
 
 string metodo1(const string& texto, int n);
 string metodo2(const string& texto, int n);
+string decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo);
+bool esSoloNumeros(const string& texto);
+bool esAlfaNumerico(const string& texto);
 
-bool esSoloNumeros(const string& texto) {
-    for (size_t i = 0; i < texto.size(); i++) {
-        if (texto[i] < '0' || texto[i] > '9') {
-            return false;
-        }
-    }
-    return true;
-}
-
-bool esAlfaNumerico(const string& texto) {
-    for (size_t i = 0; i < texto.size(); i++) {
-        char c = texto[i];
-        bool esLetraMay = (c >= 'A' && c <= 'Z');
-        bool esLetraMin = (c >= 'a' && c <= 'z');
-        bool esNumero   = (c >= '0' && c <= '9');
-
-        if (!(esLetraMay || esLetraMin || esNumero)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-void administrador(int n, int metodo) {
+void administrador::crearUsuario(){
     string cedula, clave, saldo;
 
     do {
@@ -68,7 +48,7 @@ void administrador(int n, int metodo) {
         break;
     } while (true);
 
-    ofstream file("usuarios.txt", ios::app);
+    ofstream file(this->archivoUsuario, ios::app);
     if (!file) {
         cerr << "Error al abrir el archivo de usuarios.\n";
         return;
@@ -76,15 +56,15 @@ void administrador(int n, int metodo) {
 
     string resultadoCedula, resultadoClave, resultadoSaldo;
 
-    if (metodo == 1) {
-        resultadoCedula = metodo1(cedula, n);
-        resultadoClave  = metodo1(clave, n);
-        resultadoSaldo  = metodo1(saldo, n);
+    if (this->metodo == 1) {
+        resultadoCedula = metodo1(cedula, this->n);
+        resultadoClave  = metodo1(clave, this->n);
+        resultadoSaldo  = metodo1(saldo, this->n);
     }
-    else if (metodo == 2) {
-        resultadoCedula = metodo2(cedula, n);
-        resultadoClave  = metodo2(clave, n);
-        resultadoSaldo  = metodo2(saldo, n);
+    else if (this->metodo == 2) {
+        resultadoCedula = metodo2(cedula, this->n);
+        resultadoClave  = metodo2(clave, this->n);
+        resultadoSaldo  = metodo2(saldo, this->n);
     }
     else {
         cout << "Metodo no valido.\n";
@@ -108,7 +88,7 @@ void administrador::setAdmin(int n_, int metodo_, string archivoUsuario_){
 
 bool administrador::registroAdmin(){
 
-    ifstream file("sudo.txt");
+    ifstream file(this->archivoAdmin);
     string claveEncriptada;
     getline(file, claveEncriptada);
     file.close();

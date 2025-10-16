@@ -9,6 +9,8 @@ usuario* registroUsuario(int n, int metodo, string cedula, string clave);
 string metodo1(const string& texto, int n);
 string metodo2(const string& texto, int n);
 string decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo);
+bool esSoloNumeros(const string& texto);
+bool esAlfaNumerico(const string& texto);
 
 Cajero::Cajero() {
     usuarioActual = nullptr;
@@ -24,15 +26,87 @@ Cajero::~Cajero() {
 
 void Cajero::configurarSistema() {
     cout << "=== CONFIGURACIÓN DEL SISTEMA ===" << endl;
-    cout << "Ingrese la semilla de codificación: ";
+
+    string semillaStr;
     int semilla_;
-    cin >> semilla_;
-    cout << "Ingrese el método (1 o 2): ";
+    do {
+        cout << "Semilla de codificacion(1-32): ";
+        cin >> semillaStr;
+
+        if (esSoloNumeros(semillaStr)==false) {
+            cout << "La semilla tiene que ser un numero.\n";
+            continue;
+        }
+        else{
+            semilla_=stoi(semillaStr);
+            if ((semilla_ < 1) || (semilla_ > 32)) {
+                cout << "La semilla solo puede ser de 1 a 32.\n";
+                continue;
+            }
+            break;
+        }
+    } while (true);
+
+    string metodoStr;
     int metodo_;
-    cin >> metodo_;
-    cout << "Nombre del archivo de usuarios: ";
+    do {
+        cout << "Metodo de codificacion (1-2): ";
+        cin >> metodoStr;
+
+        if (esSoloNumeros(metodoStr)==false) {
+            cout << "La semilla tiene que ser un numero.\n";
+            continue;
+        }
+        else{
+            metodo_=stoi(metodoStr);
+            if ((metodo_!=1)||(metodo_!=2)) {
+                cout << "El metodo solo puede ser 1 o 2.\n";
+                continue;
+            }
+            break;
+        }
+    } while (true);
+
     string archivoUsuarios_;
-    cin >> archivoUsuarios_;
+    do {
+        cout << "Nombre del archivo de usuarios: ";
+        cin >> archivoUsuarios_;
+
+        if (esAlfaNumerico(archivoUsuarios_)==false) {
+            cout << "El nombre del archivo no puede contener numeros.\n";
+            continue;
+        }
+        break;
+    } while (true);
+
+    string claveAdmin;
+    do {
+        cout << "Clave del administrador (solo letras y numeros): ";
+        cin >> claveAdmin;
+
+        if (!esAlfaNumerico(claveAdmin)) {
+            cout << "La clave solo puede contener letras y numeros.\n";
+            continue;
+        }
+        break;
+    } while (true);
+
+    ofstream file("sudo.txt", ios::out);
+    if (!file) {
+        cerr << "Error al abrir el archivo de administrador.\n";
+        return;
+    }
+
+    string resultadoClaveAdmin;
+    if (this->metodo == 1) {
+        resultadoClaveAdmin = metodo1(claveAdmin, this->semilla);
+    }
+    else if (this->metodo == 2) {
+        resultadoClaveAdmin = metodo2(claveAdmin, this->semilla);
+    }
+
+    file << resultadoClaveAdmin;
+    file.close();
 
     this->semilla=semilla_;
     this->metodo=metodo_;
@@ -132,6 +206,7 @@ void Cajero::ejecutar() {
             break;
         case 2:
             procesoAdmin();
+            break;
         case 3:
             cout << "Hasta pronto.\n";
             break;
@@ -144,9 +219,8 @@ void Cajero::ejecutar() {
 
 void Cajero::procesoAdmin(){
 
-    registro=admin->resgistroAdmin;
-    if (registro){
-        admin.setAdmin(this->n,this->metodo,this->archivoUsuarios);
+    if (admin.registroAdmin()){
+        admin.setAdmin(this->semilla,this->metodo,this->archivoUsuarios);
         admin.crearUsuario();
     }
 
@@ -178,8 +252,11 @@ usuario* registroUsuario(int n, int metodo, string cedula, string clave) {
 
         if (ced == cedulaEncriptada && cla == claveEncriptada) {
             file.close();
-            string saldoDesencriptado=decodificador(sal,sal.size(),n,metodo);
+            unsigned char* arr = new unsigned char[sal.size()];
+            memcpy(arr, sal.data(), sal.size());
+            string saldoDesencriptado=decodificador(arr,sal.size(),n,metodo);
             int saldoFinal=stoi(saldoDesencriptado);
+            delete[] arr;
             usuario* userActual = new usuario(cedula, clave, saldoFinal);
             return userActual;
         }

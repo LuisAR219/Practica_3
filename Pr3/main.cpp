@@ -1,5 +1,5 @@
 #include <iostream>
-#include "admin.cpp"
+#include "administrador.h"
 #include "cajero.h"
 
 using namespace std;

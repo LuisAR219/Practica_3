@@ -9,7 +9,8 @@ SOURCES += \
         codificador.cpp \
         main.cpp\
         decodificador.cpp\
-        usuario.cpp
+        usuario.cpp \
+        verificaciones.cpp
 
 HEADERS += \
     administrador.h \
