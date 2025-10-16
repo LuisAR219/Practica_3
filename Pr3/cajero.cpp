@@ -30,7 +30,7 @@ void Cajero::configurarSistema() {
     string semillaStr;
     int semilla_;
     do {
-        cout << "Semilla de codificacion(1-7): ";
+        cout << "Semilla de codificacion(1-32): ";
         cin >> semillaStr;
 
         if (esSoloNumeros(semillaStr)==false) {
@@ -39,8 +39,8 @@ void Cajero::configurarSistema() {
         }
         else{
             semilla_=stoi(semillaStr);
-            if ((semilla_ < 1) || (semilla_ > 8)) {
-                cout << "La semilla solo puede ser de 1 a 7.\n";
+            if ((semilla_ < 1) || (semilla_ > 32)) {
+                cout << "La semilla solo puede ser de 1 a 32.\n";
                 continue;
             }
             break;
@@ -157,9 +157,9 @@ void Cajero::menuCliente() {
 void Cajero::consultarSaldo() {
     int saldoActual = usuarioActual->consultarSaldo();
     if (saldoActual == -1) {
-        cout << "No tienes saldo suficiente para pagar la tarifa de 1000 COP.\n";
+        cout << "\nNo tienes saldo suficiente para pagar la tarifa de 1000 COP.\n";
     } else {
-        cout << "Saldo actual: " << saldoActual << " COP\n";
+        cout << "\nSaldo actual: " << saldoActual << " COP\n";
     }
 }
 

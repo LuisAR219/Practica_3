@@ -3,147 +3,171 @@
 
 using namespace std;
 
-unsigned int construirBloques(int bitsEnBloque,int bitInicial, const unsigned char* msjCodificado);
+unsigned int construirBloques(int bitsEnBloque, int bitInicial, const unsigned char* msjCodificado);
 void escribirBits(int valorBit, unsigned char* decodificado, int &byteIndex, int &bitIndex);
 int calcularBitsEnBloque(int bitInicial, int n, int numBits);
 
-bool leerBitDecodificador(const unsigned char* bits, int pos) {
-    int byteIndex = pos / 8;
-    int bitIndex = 7 - (pos % 8);
-    return (bits[byteIndex] >> bitIndex) & 1;
-}
-
 string decodificador(unsigned char* msjCodificado, int tamanoCodificado, int n, int metodo) {
-    unsigned char* decodificado = new unsigned char[tamanoCodificado]();
+    unsigned char* decodificado = new unsigned char[tamanoCodificado + 1]();
 
     if (metodo == 1) {
         int numBits = tamanoCodificado * 8;
         int numBloques = (numBits + n - 1) / n;
 
         int byteIndex = 0, bitIndex = 0;
-        unsigned int mascara = 1;
+
+        unsigned int* bloquesOriginales = new unsigned int[numBloques]();
+        unsigned int* bloquesDecodificados = new unsigned int[numBloques]();
 
         for (int bloqueNum = 0; bloqueNum < numBloques; bloqueNum++) {
             int bitInicial = bloqueNum * n;
             int bitsEnBloque = calcularBitsEnBloque(bitInicial, n, numBits);
+            bloquesOriginales[bloqueNum] = construirBloques(bitsEnBloque, bitInicial, msjCodificado);
+        }
 
-            unsigned int bloqueCodificado = construirBloques(bitsEnBloque, bitInicial, msjCodificado);
-            unsigned int bloqueProcesado = bloqueCodificado;
+        for (int bloqueNum = 0; bloqueNum < numBloques; bloqueNum++) {
+            int bitInicial = bloqueNum * n;
+            int bitsEnBloque = calcularBitsEnBloque(bitInicial, n, numBits);
+            unsigned int bloqueCodificado = bloquesOriginales[bloqueNum];
+            unsigned int bloqueDecodificado = bloqueCodificado;
 
             if (bloqueNum == 0) {
-                for (int i = bitsEnBloque - 1; i >= 0; i--) {
-                    bloqueProcesado ^= (mascara << i);
-                    bool valorBit = (bloqueProcesado >> i) & 1;
-                    escribirBits(valorBit ? 1 : 0, decodificado, byteIndex, bitIndex);
-                }
+                bloqueDecodificado = (~bloqueCodificado) & ((1u << bitsEnBloque) - 1);
             } else {
-                int unos = 0, ceros = 0;
+                unsigned int bloqueAnteriorDecod = bloquesDecodificados[bloqueNum - 1];
+                int bitsAnterior = calcularBitsEnBloque((bloqueNum - 1) * n, n, numBits);
 
-                for (int j = bitInicial - n; j < bitInicial && j < numBits; j++) {
-                    if (leerBitDecodificador(decodificado, j)) {
+                int unos = 0, ceros = 0;
+                for (int i = 0; i < bitsAnterior; i++) {
+                    if ((bloqueAnteriorDecod >> (bitsAnterior - 1 - i)) & 1) {
                         unos++;
                     } else {
                         ceros++;
                     }
                 }
 
-                if (unos == ceros) {
-                    for (int i = bitsEnBloque - 1; i >= 0; i--) {
-                        bloqueProcesado ^= (mascara << i);
-                        bool valorBit = (bloqueProcesado >> i) & 1;
-                        escribirBits(valorBit ? 1 : 0, decodificado, byteIndex, bitIndex);
-                    }
+                if (ceros == unos) {
+                    bloqueDecodificado = (~bloqueCodificado) & ((1u << bitsEnBloque) - 1);
                 } else if (ceros > unos) {
-                    for (int i = bitsEnBloque - 1; i >= 0; i--) {
-                        int posRelativa = bitsEnBloque - 1 - i;
-                        if (posRelativa % 2 == 1) {
-                            bloqueProcesado ^= (mascara << i);
+                    for (int pos = 1; pos <= bitsEnBloque; pos++) {
+                        if (pos % 2 == 0) {
+                            int bitIndex = bitsEnBloque - pos;
+                            bloqueDecodificado ^= (1u << bitIndex);
                         }
-                        bool valorBit = (bloqueProcesado >> i) & 1;
-                        escribirBits(valorBit ? 1 : 0, decodificado, byteIndex, bitIndex);
                     }
                 } else {
-                    for (int i = bitsEnBloque - 1; i >= 0; i--) {
-                        int posRelativa = bitsEnBloque - 1 - i;
-                        if ((posRelativa + 1) % 3 == 0) {
-                            bloqueProcesado ^= (mascara << i);
+                    for (int pos = 1; pos <= bitsEnBloque; pos++) {
+                        if (pos % 3 == 0) {
+                            int bitIndex = bitsEnBloque - pos;
+                            bloqueDecodificado ^= (1u << bitIndex);
                         }
-                        bool valorBit = (bloqueProcesado >> i) & 1;
-                        escribirBits(valorBit ? 1 : 0, decodificado, byteIndex, bitIndex);
                     }
                 }
             }
+
+            bloquesDecodificados[bloqueNum] = bloqueDecodificado;
+
+            for (int i = bitsEnBloque - 1; i >= 0; i--) {
+                int valorBit = (bloqueDecodificado >> i) & 1;
+                escribirBits(valorBit, decodificado, byteIndex, bitIndex);
+            }
         }
 
-        string resultado(reinterpret_cast<char*>(decodificado), tamanoCodificado);
+        delete[] bloquesOriginales;
+        delete[] bloquesDecodificados;
+
+        string resultado(reinterpret_cast<char*>(decodificado), byteIndex + (bitIndex > 0 ? 1 : 0));
         delete[] decodificado;
         return resultado;
+
     }
     else if (metodo == 2) {
         int numBits = tamanoCodificado * 8;
         int numBloques = (numBits + n - 1) / n;
 
-        int byteIndex = 0, bitIndex = 0, valorBit = 0;
-        unsigned int bloque = 0, mascara = 1;
+        int byteIndex = 0, bitIndex = 0;
 
         for (int bloqueNum = 0; bloqueNum < numBloques; bloqueNum++) {
             int bitInicial = bloqueNum * n;
             int bitsEnBloque = calcularBitsEnBloque(bitInicial, n, numBits);
 
-            bloque = construirBloques(bitsEnBloque, bitInicial, msjCodificado);
+            if (bitsEnBloque < n) {
+                for (int i = 0; i < bitsEnBloque; i++) {
+                    int bitActual = bitInicial + i;
+                    int byteContenedor = bitActual / 8;
+                    int posicionBit = 7 - (bitActual % 8);
+                    bool valorBit = (msjCodificado[byteContenedor] >> posicionBit) & 1;
+                    escribirBits(valorBit, decodificado, byteIndex, bitIndex);
+                }
+            } else {
+                unsigned int bloque = construirBloques(bitsEnBloque, bitInicial, msjCodificado);
 
-            unsigned int mascaraBits = (1u << bitsEnBloque) - 1;
-            unsigned int bloqueModificado = ((bloque << 1) & mascaraBits) | ((bloque >> (bitsEnBloque - 1)) & mascara);
+                unsigned int mascaraBits = (1u << bitsEnBloque) - 1;
+                unsigned int bitMasSignificativo = (bloque >> (bitsEnBloque - 1)) & 1;
+                unsigned int bloqueDecodificado = ((bloque << 1) | bitMasSignificativo) & mascaraBits;
 
-            for (int i = bitsEnBloque - 1; i >= 0; i--) {
-                valorBit = (bloqueModificado >> i) & 1;
-                escribirBits(valorBit, decodificado, byteIndex, bitIndex);
+                for (int i = bitsEnBloque - 1; i >= 0; i--) {
+                    int valorBit = (bloqueDecodificado >> i) & 1;
+                    escribirBits(valorBit, decodificado, byteIndex, bitIndex);
+                }
             }
         }
 
-        string resultado(reinterpret_cast<char*>(decodificado), tamanoCodificado);
+        string resultado(reinterpret_cast<char*>(decodificado), byteIndex + (bitIndex > 0 ? 1 : 0));
         delete[] decodificado;
         return resultado;
     }
 
+    delete[] decodificado;
     return "";
 }
 
-unsigned int construirBloques(int bitsEnBloque, int bitInicial, const unsigned char* msjCodificado) {
-    unsigned int bloque = 0;
-    int valorBit = 0;
 
-    for (int i = 0; i < bitsEnBloque; i++) {
-        int bitActual = bitInicial + i;
-        int byteContenedor = bitActual / 8;
-        int posicionBit = 7 - (bitActual % 8);
-        unsigned char byte = msjCodificado[byteContenedor];
-        valorBit = (byte >> posicionBit) & 1;
-        bloque = (bloque << 1) | valorBit;
+unsigned int construirBloques(int bitsEnBloque,int bitInicial, const unsigned char* msjCodificado){
+
+    unsigned int bloque=0;
+    int valorBit=0;
+
+    for (int i=0; i<bitsEnBloque; i++) {
+        int bitActual=bitInicial+i;
+
+        int byteContenedor=bitActual/8; //Byte de msjCodificado que contiene a bitActual
+        int pocisionBit=7-(bitActual%8); //Posicion bitActual dentro de byteContenedor
+
+        unsigned char byte=msjCodificado[byteContenedor];
+        valorBit=(byte>>pocisionBit)&1;
+
+        bloque=(bloque<<1)|valorBit; //Construyo el bloque de n bits
     }
     return bloque;
 }
 
-void escribirBits(int valorBit, unsigned char* decodificado, int &byteIndex, int &bitIndex) {
-    if (valorBit == 1) {
-        decodificado[byteIndex] |= (1u << (7 - bitIndex));
-    } else {
-        decodificado[byteIndex] &= ~(1u << (7 - bitIndex));
+void escribirBits(int valorBit, unsigned char* decodificado, int &byteIndex, int &bitIndex){
+
+    if (valorBit==true){
+        decodificado[byteIndex] |= (1u << (7 - bitIndex)); //Escribo un 1
+    }
+    else {
+        decodificado[byteIndex] &= ~(1u << (7 - bitIndex)); //Escribo un 0
     }
     bitIndex++;
-    if (bitIndex == 8) {
+    if (bitIndex == 8) { //Pasa al siguiente byte
         bitIndex = 0;
         byteIndex++;
     }
+
 }
 
-int calcularBitsEnBloque(int bitInicial, int n, int numBits) {
+int calcularBitsEnBloque(int bitInicial, int n, int numBits){
+
     int bitsEnBloque;
     if (bitInicial + n <= numBits) {
-        bitsEnBloque = n;
-    } else {
-        bitsEnBloque = numBits - bitInicial;
+        bitsEnBloque = n;  //Mensaje multiplo de n
+    }
+    else {
+        bitsEnBloque = numBits - bitInicial;  //Bits sobrantes (no multiplo de n)
     }
     return bitsEnBloque;
+
 }
 
