@@ -25,7 +25,7 @@ Cajero::~Cajero() {
 }
 
 void Cajero::configurarSistema() {
-    cout << "=== CONFIGURACIÓN DEL SISTEMA ===" << endl;
+    cout << "=== CONFIGURACION DEL SISTEMA ===" << endl;
 
     string semillaStr;
     int semilla_;
@@ -54,7 +54,7 @@ void Cajero::configurarSistema() {
         cin >> metodoStr;
 
         if (esSoloNumeros(metodoStr)==false) {
-            cout << "La semilla tiene que ser un numero.\n";
+            cout << "El metodo tiene que ser un numero.\n";
             continue;
         }
         else{
@@ -108,8 +108,8 @@ void Cajero::setCodificacionUsuario(){
 
 void Cajero::iniciarSesion() {
     string cedula, clave;
-    cout << "\n=== INICIO DE SESIÓN ===\n";
-    cout << "Cédula: ";
+    cout << "\n=== INICIO DE SESION ===" << endl;
+    cout << "Cedula: ";
     cin >> cedula;
     cout << "Clave: ";
     cin >> clave;
@@ -129,11 +129,11 @@ void Cajero::iniciarSesion() {
 void Cajero::menuCliente() {
     int opcion = 0;
     do {
-        cout << "\n=== MENÚ CLIENTE ===\n";
+        cout << "\n=== MENU CLIENTE ===" << endl;
         cout << "1. Consultar saldo\n";
         cout << "2. Retirar dinero\n";
         cout << "3. Salir\n";
-        cout << "Opción: ";
+        cout << "Opcion: ";
         cin >> opcion;
 
         switch (opcion) {
@@ -144,10 +144,10 @@ void Cajero::menuCliente() {
             retirarDinero();
             break;
         case 3:
-            cout << "Cerrando sesión...\n";
+            cout << "Cerrando sesion...\n";
             break;
         default:
-            cout << "Opción inválida.\n";
+            cout << "Opcion invalida.\n";
         }
 
     } while (opcion != 3);
@@ -172,7 +172,7 @@ void Cajero::retirarDinero() {
     if (usuarioActual->retirarSaldo(monto)) {
         cout << "Retiro exitoso.\n";
     } else {
-        cout << "Saldo insuficiente (recuerda que se descuenta también la tarifa de 1000 COP).\n";
+        cout << "Saldo insuficiente (recuerda que se descuenta tambien la tarifa de 1000 COP).\n";
     }
 }
 
@@ -180,11 +180,11 @@ void Cajero::retirarDinero() {
 void Cajero::ejecutar() {
     int opcion = 0;
     do {
-        cout << "\n=== CAJERO ELECTRÓNICO ===\n";
-        cout << "1. Iniciar sesión como usuario\n";
-        cout << "2. Iniciar sesión como administrador\n";
+        cout << "\n=== CAJERO ELECTRONICO ===" << endl;
+        cout << "1. Iniciar sesion como usuario\n";
+        cout << "2. Iniciar sesion como administrador\n";
         cout << "3. Salir\n";
-        cout << "Opción: ";
+        cout << "Opcion: ";
         cin >> opcion;
 
         switch (opcion) {
@@ -198,7 +198,7 @@ void Cajero::ejecutar() {
             cout << "Hasta pronto.\n";
             break;
         default:
-            cout << "Opción inválida.\n";
+            cout << "Opcion invalida.\n";
         }
     } while (opcion != 3);
 }
